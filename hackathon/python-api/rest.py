@@ -21,6 +21,8 @@ with open('results.csv') as csvDataFile:
 
 app = Flask(__name__)
 
+cors = CORS(app, resources={r"/tasks": {"origins": "http://localhost:5000"}})
+
 tasks = [
     {
         'id': values[x][0],
