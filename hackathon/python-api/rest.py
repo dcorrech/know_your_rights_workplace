@@ -17,14 +17,14 @@ result = []
 with open('results.csv') as csvDataFile:
     csvReader = csv.reader(csvDataFile)
     for row in csvReader:
-        result.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
+        result.append([row[0], row[2], row[3], row[4], row[5], row[6], row[7]])
         id = row[0]
-        what_happened = row[1]
-        employer = row[2]
-        reason = row[3]
-        province = row[4]
-        details = row[5]
-        resolution = row[6]
+        what_happened = row[2]
+        employer = row[3]
+        reason = row[4]
+        province = row[5]
+        details = row[6]
+        resolution = row[7]
 
 
 app = Flask(__name__)
