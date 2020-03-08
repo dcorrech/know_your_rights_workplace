@@ -9,15 +9,14 @@ import csv
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
-# The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1s8-9pxkwPvWaOeYIqnnntlkEuhreZWr8LBmV-0jL_5s'
-SAMPLE_RANGE_NAME = 'Sheet1!A:G'
+# The ID and range of a spreadsheet.
+SPREADSHEET_ID = '1s8-9pxkwPvWaOeYIqnnntlkEuhreZWr8LBmV-0jL_5s'
+RANGE_NAME = 'Sheet1!A:G'
 
 def main():
     """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
+    Puts values from a spreadsheet into a csv.
     """
-    print('In program')
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -41,8 +40,8 @@ def main():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                range=SAMPLE_RANGE_NAME).execute()
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                range=RANGE_NAME).execute()
     values = result.get('values', [])
 
     if not values:
@@ -51,7 +50,7 @@ def main():
         print('Creating csv')
         with open('kyr_data.csv', 'w', newline='') as file:
             for row in values:
-            # Print columns A and F, which correspond to indices 0 and 5.
+            # Print columns A through G, which correspond to indices 0 through 6.
                 print(row[0])
                 writer = csv.writer(file)
                 writer.writerow([row[0],row[1],row[2],row[3],row[4],row[5],row[6]])
