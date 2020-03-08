@@ -14,10 +14,10 @@ SPREADSHEET_ID = '1s8-9pxkwPvWaOeYIqnnntlkEuhreZWr8LBmV-0jL_5s'
 RANGE_NAME = 'Sheet1!A:G'
 
 def get_value():
-    values = main()
-    return values[0][0]
+    values = read_sheets()
+    return values
 
-def main():
+def read_sheets():
     """Shows basic usage of the Sheets API.
     Puts values from a spreadsheet into a csv.
     """
@@ -25,9 +25,9 @@ def main():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    # if os.path.exists('token.pickle'):
-    #     with open('token.pickle', 'rb') as token:
-    #         creds = pickle.load(token)
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -60,6 +60,3 @@ def main():
                 writer.writerow([row[0],row[1],row[2],row[3],row[4],row[5],row[6]])
         print('Finished csv')
         return values
-
-if __name__ == '__main__':
-    main()

@@ -11,12 +11,16 @@ import csv
 import gensim
 
 nltk.download("word2vec_sample")
+nltk.download('stopwords')
+nltk.download('punkt')
+
+
 word2vec_sample = str(find('models/word2vec_sample/pruned.word2vec.txt'))
 word2vec_model = gensim.models.KeyedVectors.load_word2vec_format(word2vec_sample, binary=False)
 
 
 class get_most_similar_text():
-    def __init__(self, input_csv, input_user_id, stopwords, word2vec_model):
+    def __init__(self, input_csv, input_user_id, stopwords = stopwords, word2vec_model = word2vec_model):
         self.input_csv = input_csv
         input_df = pd.read_csv(input_csv) #'KYR_data.csv'
         self.archive_df = input_df[input_df["Unique ID"] != input_user_id] 
@@ -100,6 +104,3 @@ class get_most_similar_text():
         archive_processed = self.get_tokenized_docs()
         similarities_dict = self.get_similarities(input_text_vec=input_vec, archive_processed=archive_processed)
         return self.output_most_similar_text(similarities_dict)
-
-class_ = get_most_similar_text(input_csv = "archive.csv",input_user_id= 0, stopwords = stopwords, word2vec_model = word2vec_model)
-class_.forward()
