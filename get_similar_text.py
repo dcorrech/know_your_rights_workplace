@@ -4,6 +4,7 @@ from sklearn.decomposition import TruncatedSVD
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords 
 from nltk.data import find
+import nltk
 import numpy as np
 import pandas as pd
 import csv
@@ -13,21 +14,21 @@ nltk.download("word2vec_sample")
 word2vec_sample = str(find('models/word2vec_sample/pruned.word2vec.txt'))
 word2vec_model = gensim.models.KeyedVectors.load_word2vec_format(word2vec_sample, binary=False)
 
+
 class get_most_similar_text():
     def __init__(self, input_csv, input_user_id, stopwords, word2vec_model):
         self.input_csv = input_csv
-        input_df = pd.read_csv(input_csv).dropna(inplace = True) #'KYR_data.csv'
+        input_df = pd.read_csv(input_csv) #'KYR_data.csv'
         self.archive_df = input_df[input_df["Unique ID"] != input_user_id] 
         self.input_text = input_df[input_df["Unique ID"] == input_user_id].loc[:,"Details"][0]
-        keys = self.archive_df['Unique ID'].iloc[1:]
-        vals = self.archive_df['Details'].iloc[1:]
+        keys = self.archive_df['Unique ID'].iloc[1:] # this needs to be diff dor diff input_user
+        vals = self.archive_df['Details'].iloc[1:]# this needs to be diff dor diff input_user
         self.archive_dict  =  dict(zip(keys, vals))
-        self.stopwords = stopwords
+        self.stopwords = set(stopwords.words('english')) 
         self.word2vec_model = word2vec_model
 
     def preprocess(self, text):
         '''tokenize text into list of lists, sents and words, remove stopwords'''
-        stop_words = set(stopwords.words('english')) 
         sents = sent_tokenize(text)
         result = []
         for sent in sents:
@@ -35,7 +36,7 @@ class get_most_similar_text():
             result.append([w for w in word_tokenized if not w in self.stopwords] )
         return result
 
-    def get_text_embedding(sents, word_vectors): # k = len(sents)
+    def get_text_embedding(self, sents): # k = len(sents)
         
         ''' returns an word embeddings of len(sents), produced by summing the embeddings of words 
         in each sentences
@@ -56,22 +57,23 @@ class get_most_similar_text():
         
         return result.flatten()
 
-    def get_tokenized_docs(all_inputs_archive):
+    def get_tokenized_docs(self):
         ''' Given all documented user cases dict, return dict of doc_id to word-tokenized sents
         ------------
         all_inputs_archive: dictionary where key = user_id, value = raw text'''
         result = dict()
-        for doc, text in all_inputs_archive.items():
-            result[doc] = preprocess(text)
+        for doc, text in self.archive_dict.items():
+            if(type(text)) == str:
+                result[doc] = self.preprocess(text)
         return result
 
-    def get_similarities(input_text_vec, archive_preprocessed_dict):
+    def get_similarities(self, input_text_vec, archive_processed):
         ''' Takes in embedding of input text (dense matrix) and preprocessed dictionary of user_id: tokenized_text.
         Returns dictionary of cosine similaries where key is user_id, output is cosine similarity between archive text and input text'''
         text_similarities = dict()
         for usr_id, text in archive_processed.items():
-            text_vec = get_text_embedding(text, word2vec_model)
-            text_similarities[usr_id] = 1 - cosine(input_vec, text_vec)
+            text_vec = self.get_text_embedding(text)
+            text_similarities[usr_id] = 1 - cosine(input_text_vec, text_vec)
         return text_similarities
 
 
@@ -90,12 +92,14 @@ class get_most_similar_text():
         result = self.archive_df[self.archive_df["Unique ID"] == best_usr]
         result["similarity"] = max_sim
         
-        return result.to_csv(r'../Code/results.csv')
+        return result.to_csv(r'./results.csv')
     
     def forward(self):
-        sents_input = preprocess(self.input_text, self.stopwords)
-        input_vec = get_text_embedding(self, sents_input)
-        archive_processed = get_tokenized_docs(self.archive_dict)
-        similarities_dict = get_similarities(input_vec, archive_processed)
-        return output_most_similar_text(self, similarities_dict)
+        sents_input = self.preprocess(self.input_text)
+        input_vec = self.get_text_embedding(sents_input)
+        archive_processed = self.get_tokenized_docs()
+        similarities_dict = self.get_similarities(input_text_vec=input_vec, archive_processed=archive_processed)
+        return self.output_most_similar_text(similarities_dict)
 
+class_ = get_most_similar_text(input_csv = "archive.csv",input_user_id= 0, stopwords = stopwords, word2vec_model = word2vec_model)
+class_.forward()
