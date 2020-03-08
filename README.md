@@ -1,4 +1,4 @@
-# know_your_rights_chatbot
+# Know Your Rights (KYR) @ Workplace
 Know your rights in the workplace; an app that provides resources and lets women and other gender minorities know their rights when dealing with gender wage gaps, harrassment, and other problems in the workplace.
 
 ## Inspiration
